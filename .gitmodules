@@ -1,0 +1,3 @@
+[submodule "EC349-Seminar-2-Problem-Set"]
+	path = EC349-Seminar-2-Problem-Set
+	url = https://github.com/EC349-Data-Science-for-Economists/EC349-Seminar-2-Problem-Set.git
