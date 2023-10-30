@@ -1,0 +1,302 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+---
+
+## Week 5: Lecture 1: Data Acquisition and Extraction
+
+#### Relevant chapters:
+1. **[Chapter 8, 21-25. R for Data Science (2nd ed)](https://r4ds.hadley.nz/)**
+
+2. **[Chapter 11. R for Data Science (1st ed)](https://r4ds.had.co.nz/data-import.html)**
+
+<!-- your comment -->
+
+### Commenting out Texts
+It is useful to comment out text in the source document, which will not be displayed in the final output document. For this purpose, we can use the HTML syntax <#!-- your comment -->, ***excluding the #***. 
+The comments will not be displayed in any output format.
+
+Comments can span either a single line or multiple lines. This may be useful for you to write draft content.
+If you use RStudio, you can use the keyboard shortcut **Ctrl + Shift + C** (**Command + Shift + C** on macOS) to comment out a line of text. 
+
+
+
+**See** : [How to comment out text ](https://bookdown.org/yihui/rmarkdown-cookbook/comments.html) for more on shortcut
+      
+      Note: This keyboard shortcut sometimes stop working in newer versions of RStudio for Windows. This onlu SOMETIMES fix the problem temporarily. If this does not work, change the shortcut using the instructions in this linK: 
+[Customise Shortcut in RStudio](https://docs.posit.co/ide/user/ide/guide/productivity/custom-shortcuts.html#:~:text=Modify%20a%20command's%20shortcut%20by,based%20on%20the%20keys%20entered.)
+
+> Write your name and underline it. What do you find?
+
+getwd()
+
+installed. packages()
+installed.packages()
+install.packages("tidyverse")
+
+#### How can I see what data sets are available when I start R?
+Here is how to locate the data set and load it into R.
+<!-- To see what datasets packages come with R's base package -->
+help(package = "datasets")
+
+
+<!-- view the documentation for the base dataset package -->
+library(help = "datasets")
+
+cars
+
+vs 
+
+```{r}
+cars
+```
+
+iris
+
+vs 
+
+```{r}
+iris
+```
+
+help(package = "tidyverse")
+
+library(tidyverse)
+
+tidyverse_packages(include_self = TRUE)
+
+<!-- data() command will list all the datasets in loaded packages. -->
+data() 
+
+<!-- The data(JohnsonJohnson) command will load the data set JohnsonJohnson into memory. -->
+
+data(JohnsonJohnson)
+
+JohnsonJohnson
+
+<!-- To see result in source tab and not console -->
+
+```{r}
+JohnsonJohnson
+```
+
+## Reading a .csv file.
+
+We will work with the tidyverse's dataset package read_csv.
+
+library (tidyverse)
+
+students <- read_csv("https://pos.it/r4ds-students-csv")
+
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv")
+```
+
+When you run read_csv(), it prints out a message telling you the number of rows and columns of data, the delimiter that was used, and the column specifications (names of columns organized by the type of data the column contains). It also prints out some information about retrieving the full column specification and how to quiet this message.
+
+#### Transforming Data
+Once you read data in, the first step usually involves transforming it in some way to make it easier to work with in the rest of your analysis. Let’s take another look at the students data with that in mind.
+
+```{r}
+students
+```
+
+students
+
+In the favourite.food column, there are a bunch of food items, and then the character string N/A, which should have been a real NA that R will recognize as “not available”. This is something we can address using the na argument. By default, read_csv() only recognizes empty strings ("") in this dataset as NAs, we want it to also recognize the character string "N/A".
+
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", ""))
+```
+
+```{r}
+students
+```
+
+
+You might also notice that the Student ID and Full Name columns are surrounded by backticks. That’s because they contain spaces, breaking R’s usual rules for variable names; they’re non-syntactic names. To refer to these variables, you need to surround them with backticks, `:
+
+
+```{r}
+students |> 
+  rename(
+    student_id = `Student ID`,
+    full_name = `Full Name`
+  )
+```
+
+An alternative approach is to use ***janitor::clean_names()*** to use some heuristics to turn them all into **snake case** at once.
+
+The janitor package is not part of the tidyverse, but it offers handy functions for data cleaning and works well within data pipelines that use ***|>***.
+
+```{r}
+install.packages("janitor")
+library(janitor)
+```
+
+```{r}
+students |> janitor::clean_names()
+```
+
+Another common task after reading in data is to consider variable types. For example, meal_plan is a categorical variable with a known set of possible values, which in R should be represented as a factor:
+
+```{r}
+students |>
+  janitor::clean_names() |>
+  mutate(meal_plan = factor(meal_plan))
+```
+
+Note that the values in the meal_plan variable have stayed the same, but the type of variable denoted underneath the variable name has changed from character **(<chr>)** to factor **(<fct>)**. Learn more about factors in [Chapter 17](https://r4ds.hadley.nz/factors).
+
+
+Before you analyze these data, you’ll probably want to fix the age column. Currently, age is a character variable because one of the observations is typed out as five instead of a numeric 5. For more on fixing this issue [Chapter 21](https://r4ds.hadley.nz/spreadsheets).
+
+NOTE: If working directly from the textbook, you might encounter an erro if you try to run the following command immediately:
+
+    students <- students |>
+      janitor::clean_names() |>
+      mutate( 
+        meal_plan = factor(meal_plan),
+        age = parse_number(if_else(age == "five", "5", age))
+      )
+    
+**So first, I read the file again, if not I get an error**
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", ""))
+```
+
+**Now, I proceed to fix the issue**
+
+```{r}
+students <- students |>
+  janitor::clean_names() |>
+  mutate(
+    meal_plan = factor(meal_plan),
+    age = parse_number(if_else(age == "five", "5", age))
+  )
+```
+
+```{r}
+students
+```
+A new function here is if_else(), which has three arguments. The first argument test should be a logical vector. The result will contain the value of the second argument, yes, when test is TRUE, and the value of the third argument, no, when it is FALSE. Here we’re saying if age is the character string "five", make it "5", and if not leave it as age. You will learn more about if_else() and logical vectors in [Chapter 13](https://r4ds.hadley.nz/logicals).
+
+
+<!-- students <- read_csv("https://pos.it/r4ds-students-csv", na = c("N/A", ""))
+
+students -->
+
+### Working with CSV Files: read_csv
+
+* An important read command in the tidyverse is the read_csv command.
+* Take note the command notation when working in base R vs R package
+* Note that if working directly in base R and not tidyverse, the command is **read.csv.**
+
+> read_csv() can read text strings that you’ve created and formatted like a CSV file:
+
+```{r}
+read_csv(
+  "a,b,c
+  1,2,3
+  4,5,6"
+)
+```
+
+* **Usually, read_csv() uses the first line of the data for the column names, which is a very common convention. But it’s not uncommon for a few lines of metadata to be included at the top of the file. You can use skip = n to skip the first n lines.**
+
+```{r}
+read_csv(
+  "The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3",
+  skip = 2
+)
+```
+
+
+* **You can aslo use comment = "#" to drop all lines that start with (e.g.) #:** 
+
+
+```{r}
+read_csv(
+  "# A comment I want to skip
+  x,y,z
+  1,2,3",
+  comment = "#"
+)
+```
+
+
+* **In other cases, the data might not have column names. You can use *col_names = FALSE* to tell *read_csv()* not to treat the first row as headings and instead label them sequentially from X1 to Xn:**
+
+
+```{r}
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = FALSE
+)
+```
+
+* **Alternatively, you can pass *col_names* a character vector which will be used as the column names:**
+
+
+```{r}
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = c("x", "y", "z")
+)
+```
+
+
+#### Personal Practice: Work through [Exercise 8.2.4 of the 1st edition of the textbook](https://r4ds.hadley.nz/data-import#exercises).
+
+
+### Controlling column types
+
+* A CSV file doesn’t contain any information about the type of each variable (i.e. whether it’s a logical, number, string, etc.), so readr will try to guess the type.
+
+
+#### Personal Practice: Work through [Section 8.3 (Controlling column types) of the 1st edition of the textbook](https://r4ds.hadley.nz/data-import#sec-col-types).  
+
+* At the end, you should be able to describes
+  + how the guessing process works, 
+  + how to resolve some common problems that cause it to fail, and, 
+  + if needed, how to supply the column types yourself. 
+* Finally, apply the recommended general strategies that are useful if readr is **failing catastrophically** and you need to **get more insight** into the structure of your file.
+
+# Next Lecture:
+
+1. **Reading Data From Multiple Files**
+2. **Parsing a vector.** [Read ahead [**here**](https://r4ds.had.co.nz/data-import.html#parsing-a-vector)]
+3. **Parsing a file.** [Read ahead [**here**](https://r4ds.had.co.nz/data-import.html#parsing-a-file)]]
+4. **Tidyverse Basics: Load and Clean Data with R tidyverse Tools** [Read ahead [**here**](https://www.dataquest.io/blog/load-clean-data-r-tidyverse/)]
+
+
+---------
+# EC349: Data Science for Economists. Week 5: Lecture 
