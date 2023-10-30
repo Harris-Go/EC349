@@ -48,16 +48,26 @@ If you use RStudio, you can use the keyboard shortcut **Ctrl + Shift + C** (**Co
 
 > Write your name and underline it. What do you find?
 
+Harris Goodman
+
 getwd()
 
-installed. packages()
+```{R}
 installed.packages()
+```
+```{R}
+installed.packages()
+```
+```{R}
 install.packages("tidyverse")
+```
 
 #### How can I see what data sets are available when I start R?
 Here is how to locate the data set and load it into R.
 <!-- To see what datasets packages come with R's base package -->
+```{R}
 help(package = "datasets")
+```
 
 
 <!-- view the documentation for the base dataset package -->
@@ -90,8 +100,6 @@ data()
 
 <!-- The data(JohnsonJohnson) command will load the data set JohnsonJohnson into memory. -->
 
-data(JohnsonJohnson)
-
 JohnsonJohnson
 
 <!-- To see result in source tab and not console -->
@@ -104,8 +112,9 @@ JohnsonJohnson
 
 We will work with the tidyverse's dataset package read_csv.
 
-library (tidyverse)
-
+```{R}
+library(tidyverse)
+```
 students <- read_csv("https://pos.it/r4ds-students-csv")
 
 
@@ -163,6 +172,8 @@ students |> janitor::clean_names()
 Another common task after reading in data is to consider variable types. For example, meal_plan is a categorical variable with a known set of possible values, which in R should be represented as a factor:
 
 ```{r}
+library(dplyr)
+
 students |>
   janitor::clean_names() |>
   mutate(meal_plan = factor(meal_plan))
@@ -175,12 +186,14 @@ Before you analyze these data, you’ll probably want to fix the age column. Cur
 
 NOTE: If working directly from the textbook, you might encounter an erro if you try to run the following command immediately:
 
+```{R}
     students <- students |>
       janitor::clean_names() |>
       mutate( 
         meal_plan = factor(meal_plan),
         age = parse_number(if_else(age == "five", "5", age))
       )
+```
     
 **So first, I read the file again, if not I get an error**
 
