@@ -2,12 +2,21 @@
 title: "Problem Set 2 Solutions"
 author: "Harris Goodman"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+***
+
+## Github Link:
+https://github.com/Harris-Go/EC349/blob/ac90b30a5040d84735a9059b4d77c930439d9011/ProblemSet2.Rmd
+
+***
 
 ># 1.  Write your name and surname in bold font, with your Name ONLY in italics.
 
